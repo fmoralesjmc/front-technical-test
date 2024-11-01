@@ -1,102 +1,146 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Toolbar, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton } from '@mui/material';
+import { Box, Card, CardHeader, Avatar, CardMedia, CardContent, CardActions, IconButton, Typography, Collapse, Badge } from '@mui/material';
+import { red } from '@mui/material/colors';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { StyledAppBar, ColumnContainer, StyledIconButton } from './useStyles'; 
-import useGithubUsers from '@hooks/useGithubUsers';
+import GroupIcon from '@mui/icons-material/Group';
+import { StyledAppBar, StyledIconButton, StyledInputLabel, StyledOutlinedInput, StyledFormControl, StyledCardContainer, StyledBadgeContainer, StyledCardContent, StyledPagination } from './useStyles';
+import { searchGithubUsers, getFollowersCount } from '@services/githubApi';
 import LoadingIndicator from '@components/LoadingIndicator';
 
 function SearchUsers() {
   const navigate = useNavigate();
-  const [searchValue, setSearchValue] = useState('luuna-tech'); 
-  const [query, setQuery] = useState<string | null>(null);
-  const { data, loading, error } = useGithubUsers(query!);
-  const [showLoading, setShowLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState('franciscom');
+  const [query, setQuery] = useState<string | null>('franciscom');
+  const [data, setData] = useState<any[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    if (loading) {
-      setShowLoading(true);
-      timeout = setTimeout(() => {
-        setShowLoading(false);
-      }, 2000); 
-    } else {
-      timeout = setTimeout(() => {
-        setShowLoading(false);
-      }, 2000);
+    if (query) {
+      fetchData(query, currentPage);
     }
+  }, [query, currentPage]);
 
-    return () => clearTimeout(timeout); 
-  }, [loading]);
-
-  useEffect(() => {
-    if (query === null) {
-      setQuery('luuna-tech');
+  const fetchData = async (searchQuery: string, page: number) => {
+    setLoading(true);
+    try {
+      const result = await searchGithubUsers(searchQuery, "desc", 30, page);
+      const usersWithFollowers = await Promise.all(
+        result.items.map(async (user: any) => {
+          const followersCount = await getFollowersCount(user.followers_url);
+          return { ...user, followersCount };
+        })
+      );
+      setData(usersWithFollowers);
+      setTotalCount(result.total_count);
+      setTotalPages(Math.ceil(result.total_count / 30));
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
     }
-  }, [query]);
+  };
 
   const handleSearch = () => {
     setQuery(searchValue);
+    setCurrentPage(1);
   };
 
-  const handleKeyPress = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter') {
-      handleSearch();
-    }
+  const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleExpandClick = () => {
+    setExpanded(!expanded);
   };
 
   return (
     <>
-      <StyledAppBar position="fixed">
-        <Toolbar>
-          <ColumnContainer>
-            <Box sx={{ flex: 1 }}>
-              <StyledIconButton onClick={() => navigate('/')}>
-                <ArrowBackIcon />
-              </StyledIconButton>
-            </Box>
-
-            <Box sx={{ flex: 2, display: 'flex', justifyContent: 'center' }}>
-              <FormControl variant="outlined" fullWidth>
-                <InputLabel htmlFor="search-input">Buscar usuario</InputLabel>
-                <OutlinedInput
-                  id="search-input"
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  onKeyPress={handleKeyPress} 
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="buscar usuario"
-                        onClick={handleSearch}
-                        edge="end"
-                      >
-                        <SearchIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                  label="Buscar usuario"
-                />
-              </FormControl>
-            </Box>
-
-            <Box sx={{ flex: 1 }}></Box>
-          </ColumnContainer>
-        </Toolbar>
+      {/* Barra de búsqueda flotante con fondo gris */}
+      <StyledAppBar>
+        <Box sx={{ display: 'flex', alignItems: 'center'}}>
+          <StyledIconButton onClick={() => navigate('/')}>
+            <ArrowBackIcon />
+          </StyledIconButton>
+          <StyledFormControl variant="outlined" sx={{ flexGrow: 0, marginLeft: 2, maxWidth: '400px', width: '100%' }}>
+            <StyledInputLabel htmlFor="search-input">Search User</StyledInputLabel>
+            <StyledOutlinedInput
+              id="search-input"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              endAdornment={
+                <IconButton aria-label="Search User" onClick={handleSearch} edge="end">
+                  <SearchIcon />
+                </IconButton>
+              }
+              label="Search User"
+            />
+          </StyledFormControl>
+        </Box>
       </StyledAppBar>
 
-      <div style={{ marginTop: '80px' }}>
-        {showLoading && <LoadingIndicator color="#000" size="small" />} 
-        {error && <p>Error al cargar datos: {error.message}</p>}
-        {data && !loading && !showLoading && (
-          <ul>
-            {data.items.map((user: any) => (
-              <li key={user.id}>{user.login}</li>
+      {/* Contenedor de cards con scroll */}
+      <StyledCardContainer>
+        {loading && <LoadingIndicator color="#000" size="small" />}
+        {data.length > 0 && !loading && (
+          <>
+            {data.map((user: any) => (
+              <Card key={user.id} sx={{ maxWidth: 250, minWidth: 250, margin: 2 }}>
+                <CardHeader
+                  avatar={
+                    <Avatar sx={{ bgcolor: red[500] }} aria-label="usuario">
+                      {user.login.charAt(0).toUpperCase()}
+                    </Avatar>
+                  }
+                  title={user.login}
+                  subheader="GitHub User"
+                />
+                <CardMedia
+                  component="img"
+                  height="194"
+                  image={user.avatar_url}
+                  alt={`Avatar de ${user.login}`}
+                />
+                <StyledCardContent>
+                  <Typography variant="body2" color="text.secondary">
+                    <a href={user.html_url} target="_blank" rel="noopener noreferrer">View Profile on GitHub</a>
+                  </Typography>
+                </StyledCardContent>
+                <CardActions disableSpacing>
+                  <StyledBadgeContainer>
+                    <Badge badgeContent={user.followersCount} color="primary">
+                    Followers:&nbsp;&nbsp;  <GroupIcon />
+                    </Badge>
+                  </StyledBadgeContainer>
+                </CardActions>
+              </Card>
             ))}
-          </ul>
+          </>
         )}
-      </div>
+        {!loading && data.length === 0 && <p>No se encontraron resultados.</p>}
+      </StyledCardContainer>
+
+      {/* Paginación */}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          marginTop: 2,
+        }}
+      >
+        <StyledPagination
+          count={totalPages}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+        />
+      </Box>
     </>
   );
 }
