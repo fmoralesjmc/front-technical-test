@@ -15,7 +15,7 @@ export const searchGithubUsers = async (
   page: number = 1
 ): Promise<GithubResponse> => {
   try {
-    const response = await axios.get(`https://api.github.com/search/users`, {
+    const response = await axios.get(`${process.env.REACT_APP_GITHUB_API_URL}/search/users`, {
       params: { q: query, sort, per_page: perPage, page },
       headers: {
         Authorization: `Bearer ${GITHUB_TOKEN}`,
@@ -72,7 +72,7 @@ export const getFollowersCount = async (followersUrl: string): Promise<number> =
     page: number = 1
   ): Promise<GithubResponse> => {
     try {
-      const response = await axios.get(`https://api.github.com/search/repositories`, {
+      const response = await axios.get(`${process.env.REACT_APP_GITHUB_API_URL}/search/repositories`, {
         params: { q: query, sort, per_page: perPage, page },
         headers: {
           Authorization: `Bearer ${GITHUB_TOKEN}`,
