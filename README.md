@@ -29,34 +29,33 @@ This is a React project created as a solution to the [Frontend test](https://git
 - **Example**:
   ```typescript
   import LoadingIndicator from 'react-loading-indicators'
-
-function MyComponent({ loading }) {
-  return (
-    <>
-      {loading && <LoadingIndicator color="blue" size="medium" />}
-    </>
-  );
-}
+    function MyComponent({ loading }) {
+    return (
+        <>
+        {loading && <LoadingIndicator color="blue" size="medium" />}
+        </>
+    );
+    }
 
 #### 3. react-router-dom (^6.27.0)
 - **Description**: A collection of navigational components that compose declaratively with your application. It enables client-side routing and allows for single-page applications with dynamic navigation.
 - **Usage**: Essential for managing in-app navigation and routing different components or pages based on the URL.
 - **Example**:
   ```javascript
-  import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './Home';
-import About from './About';
+    import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+    import Home from './Home';
+    import About from './About';
 
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-      </Routes>
-    </Router>
-  );
-}
+    function App() {
+    return (
+        <Router>
+        <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+        </Routes>
+        </Router>
+    );
+    }
 
 ### Installation and Setup
 
