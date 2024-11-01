@@ -19,6 +19,7 @@ function SearchUsers() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [expanded, setExpanded] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (query) {
@@ -47,6 +48,11 @@ function SearchUsers() {
   };
 
   const handleSearch = () => {
+    if (searchValue.length < 5) {
+      setErrorMessage('Please enter at least 5 characters.');
+      return;
+    }
+    setErrorMessage(null);
     setQuery(searchValue);
     setCurrentPage(1);
   };
@@ -83,6 +89,11 @@ function SearchUsers() {
             />
           </StyledFormControl>
         </Box>
+        {errorMessage && (
+          <Typography color="error" sx={{ marginTop: 1 }}>
+            {errorMessage}
+          </Typography>
+        )}
       </StyledAppBar>
 
       {/* Contenedor de cards con scroll */}
