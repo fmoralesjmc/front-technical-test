@@ -15,8 +15,7 @@ export const searchGithubUsers = async (
   page: number = 1
 ): Promise<GithubResponse> => {
   try {
-    console.log("🚀 ~  params: { q: query, sort, per_page: perPage, page }:",  { q: query, sort, per_page: perPage, page })
-    const response = await axios.get(`https://api.github.com/search/users`, {
+    const response = await axios.get(`${process.env.REACT_APP_GITHUB_API_URL}/search/users`, {
       params: { q: query, sort, per_page: perPage, page },
       headers: {
         Authorization: `Bearer ${GITHUB_TOKEN}`,
@@ -63,5 +62,47 @@ export const getFollowersCount = async (followersUrl: string): Promise<number> =
     } catch (error) {
       console.error('Error fetching followers:', error);
       return 0;
+    }
+  };
+
+  export const searchGithubRepos = async (
+    query: string,
+    sort: string = 'desc',
+    perPage: number = 30,
+    page: number = 1
+  ): Promise<GithubResponse> => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_GITHUB_API_URL}/search/repositories`, {
+        params: { q: query, sort, per_page: perPage, page },
+        headers: {
+          Authorization: `Bearer ${GITHUB_TOKEN}`,
+        },
+      });
+        
+      const linkHeader = response.headers.link;
+      const paginationLinks: Partial<Record<PaginationRel, string>> = {};
+  
+      if (linkHeader) {
+        const links = linkHeader.split(',').map((link: string) => link.trim());
+        for (const link of links) {
+          const [urlPart, relPart] = link.split(';');
+          const url = urlPart.replace(/<|>/g, '').trim();
+          const relMatch = relPart.match(/rel="(.*)"/);
+  
+          if (relMatch) {
+            const rel = relMatch[1] as PaginationRel; 
+            paginationLinks[rel] = url;
+          }
+        }
+      }
+  
+      return {
+        items: response.data.items,
+        total_count: response.data.total_count,
+        paginationLinks,
+      };
+    } catch (error) {
+      console.error('Error fetching data from GitHub API:', error);
+      throw error;
     }
   };
