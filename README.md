@@ -1,43 +1,92 @@
-# Getting Started with Create React App
+# Frontend Technical Test
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a React project created as a solution to the [Frontend test](https://github.com/luuna-tech/test/tree/master/frontend) created by [`Luuna's Tech Team`](https://github.com/luuna-tech/)
 
-## Available Scripts
+### Technologies Used
+- **React**: Version 18. React is a JavaScript library for building user interfaces using reusable components.
+- **Material-UI (MUI)**: Version 6. A popular UI component library for React that implements Google's Material Design.
 
-In the project directory, you can run:
+### Principal Libraries Used
 
-### `npm start`
+#### 1. Axios (^1.7.7)
+- **Description**: Axios is a promise-based HTTP client for the browser and Node.js. It makes asynchronous HTTP requests to REST endpoints and provides easy handling of requests and responses.
+- **Usage**: Commonly used for API calls to interact with external data sources, such as making GET, POST, PUT, or DELETE requests.
+- **Example**:
+  ```javascript
+  import axios from 'axios';
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+  axios.get('https://api.example.com/data')
+    .then(response => {
+      console.log(response.data);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+#### 2. react-loading-indicators (^1.0.0)
+- **Description**: Description: A simple React library for adding loading indicators. It helps display visual feedback to users while waiting for asynchronous tasks to complete, improving user experience.
+- **Usage**: Useful for showing loading states during API calls or other proces
+- **Example**:
+  ```typescript
+  import LoadingIndicator from 'react-loading-indicators'
 
-### `npm test`
+function MyComponent({ loading }) {
+  return (
+    <>
+      {loading && <LoadingIndicator color="blue" size="medium" />}
+    </>
+  );
+}
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+#### 3. react-router-dom (^6.27.0)
+- **Description**: A collection of navigational components that compose declaratively with your application. It enables client-side routing and allows for single-page applications with dynamic navigation.
+- **Usage**: Essential for managing in-app navigation and routing different components or pages based on the URL.
+- **Example**:
+  ```javascript
+  import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Home from './Home';
+import About from './About';
 
-### `npm run build`
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+      </Routes>
+    </Router>
+  );
+}
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Installation and Setup
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/fmoralesjmc/front-technical-test.git
+   cd front-technical-test
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. **Set up environment variables:**: Create a .env file at the root of the project and add the necessary variables, e.g.:
+   ```bash
+   REACT_APP_GITHUB_API_URL=https://api.github.com
+   REACT_APP_GITHUB_TOKEN=your_github_token
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+3. **Install dependencies:**:🧩 		
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+First, install all the packages needed for the project
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```bash
+npm install
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Then, run the development server:
+
+```bash
+npm start
+```
+## Demo 🚀
+
+You can try the live demo on the next link in Vercel-> https://front-technical-test-kappa.vercel.app/
 
 ## Learn More
 
