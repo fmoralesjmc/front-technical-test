@@ -10,7 +10,7 @@ interface LoadingIndicatorProps {
 const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({ color = '#000', size = 'small' }) => {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px' }}>
-      <Atom color="#9ca59c" size="large" text="Loadgin" textColor="" />
+      <Atom color="#9ca59c" size="large" text="Loading" textColor="" />
     </Box>
   );
 };
